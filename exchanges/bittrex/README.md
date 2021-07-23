@@ -1,6 +1,6 @@
 # GoCryptoTrader package Bittrex
 
-<img src="https://github.com/thrasher-corp/gocryptotrader/blob/master/web/src/assets/page-logo.png?raw=true" width="350px" height="350px" hspace="70">
+<img src="/common/gctlogo.png?raw=true" width="350px" height="350px" hspace="70">
 
 
 [![Build Status](https://github.com/thrasher-corp/gocryptotrader/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/thrasher-corp/gocryptotrader/actions/workflows/tests.yml)
@@ -23,6 +23,11 @@ Join our slack to discuss all things related to GoCryptoTrader! [GoCryptoTrader 
 ### Current Features
 
 + REST Support
+
+### Notes
+
+- Bittrex used to have reversed market names: btc-ltc. The v3 API changed this to the more widely accepted format with first the base pair and then the quote pair: ltc-btc.
+- Asset names and market names are not case sensitive.
 
 ### How to enable
 

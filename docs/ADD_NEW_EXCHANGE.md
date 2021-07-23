@@ -202,7 +202,7 @@ Yes means supported, No means not yet implemented and NA means protocol unsuppor
 | Bithumb | Yes  | NA       | NA  |
 | BitMEX | Yes | Yes | NA |
 | Bitstamp | Yes  | Yes       | No  |
-| Bittrex | Yes | No | NA |
+| Bittrex | Yes | Yes | NA |
 | BTCMarkets | Yes | No       | NA  |
 | BTSE | Yes | Yes | NA |
 | COINUT | Yes | Yes | NA |
@@ -217,7 +217,6 @@ Yes means supported, No means not yet implemented and NA means protocol unsuppor
 | ItBit | Yes | NA | No |
 | Kraken | Yes | Yes | NA |
 | Lbank | Yes | No | NA |
-| LakeBTC | Yes | No | NA |
 | LocalBitcoins | Yes | NA | NA |
 | OKCoin International | Yes | Yes | No |
 | OKEX | Yes | Yes | No |
@@ -249,7 +248,6 @@ var Exchanges = []string{
 	"huobi",
 	"itbit",
 	"kraken",
-	"lakebtc",
 	"lbank",
 	"localbitcoins",
 	"okcoin international",

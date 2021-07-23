@@ -202,6 +202,12 @@ func (d *Detail) UpdateOrderFromDetail(m *Detail) {
 			d.LastUpdated = m.LastUpdated
 		}
 	}
+	if d.Exchange == "" {
+		d.Exchange = m.Exchange
+	}
+	if d.ID == "" {
+		d.ID = m.ID
+	}
 }
 
 // UpdateOrderFromModify Will update an order detail (used in order management)
@@ -353,6 +359,58 @@ func (d *Detail) UpdateOrderFromModify(m *Modify) {
 	}
 }
 
+// MatchFilter will return true if a detail matches the filter criteria
+// empty elements are ignored
+func (d *Detail) MatchFilter(f *Filter) bool {
+	if f.Exchange != "" && !strings.EqualFold(d.Exchange, f.Exchange) {
+		return false
+	}
+	if f.AssetType != "" && d.AssetType != f.AssetType {
+		return false
+	}
+	if !f.Pair.IsEmpty() && !d.Pair.Equal(f.Pair) {
+		return false
+	}
+	if f.ID != "" && d.ID != f.ID {
+		return false
+	}
+	if f.Type != "" && f.Type != AnyType && d.Type != f.Type {
+		return false
+	}
+	if f.Side != "" && f.Side != AnySide && d.Side != f.Side {
+		return false
+	}
+	if f.Status != "" && f.Status != AnyStatus && d.Status != f.Status {
+		return false
+	}
+	if f.ClientOrderID != "" && d.ClientOrderID != f.ClientOrderID {
+		return false
+	}
+	if f.ClientID != "" && d.ClientID != f.ClientID {
+		return false
+	}
+	if f.InternalOrderID != "" && d.InternalOrderID != f.InternalOrderID {
+		return false
+	}
+	if f.AccountID != "" && d.AccountID != f.AccountID {
+		return false
+	}
+	if f.WalletAddress != "" && d.WalletAddress != f.WalletAddress {
+		return false
+	}
+	return true
+}
+
+// Copy will return a copy of Detail
+func (d *Detail) Copy() Detail {
+	c := *d
+	if len(d.Trades) > 0 {
+		c.Trades = make([]TradeHistory, len(d.Trades))
+		copy(c.Trades, d.Trades)
+	}
+	return c
+}
+
 // String implements the stringer interface
 func (t Type) String() string {
 	return string(t)
@@ -456,15 +514,11 @@ func FilterOrdersByCurrencies(orders *[]Detail, currencies []currency.Pair) {
 
 	var filteredOrders []Detail
 	for i := range *orders {
-		matchFound := false
 		for _, c := range currencies {
-			if !matchFound && (*orders)[i].Pair.EqualIncludeReciprocal(c) {
-				matchFound = true
+			if (*orders)[i].Pair.EqualIncludeReciprocal(c) {
+				filteredOrders = append(filteredOrders, (*orders)[i])
+				break
 			}
-		}
-
-		if matchFound {
-			filteredOrders = append(filteredOrders, (*orders)[i])
 		}
 	}
 
@@ -710,18 +764,25 @@ func (c *Cancel) StandardCancel() validate.Checker {
 	})
 }
 
+// PairAssetRequired is a validation check for when a cancel request
+// requires an asset type and currency pair to be present
+func (c *Cancel) PairAssetRequired() validate.Checker {
+	return validate.Check(func() error {
+		if c.Pair.IsEmpty() {
+			return ErrPairIsEmpty
+		}
+
+		if c.AssetType == "" {
+			return ErrAssetNotSet
+		}
+		return nil
+	})
+}
+
 // Validate checks internal struct requirements
 func (c *Cancel) Validate(opt ...validate.Checker) error {
 	if c == nil {
 		return ErrCancelOrderIsNil
-	}
-
-	if c.Pair.IsEmpty() {
-		return ErrPairIsEmpty
-	}
-
-	if c.AssetType == "" {
-		return ErrAssetNotSet
 	}
 
 	var errs common.Errors
